@@ -20,11 +20,11 @@ services:
       restart_policy:
         condition: on-failure
         delay: 15s
-        max_attempts: 3
+        max_attempts: 5
         window: 120s
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      SPRING_CONFIG_IMPORT: "http://configserver:8071/"
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
 
 networks:
   sodanetwork:
