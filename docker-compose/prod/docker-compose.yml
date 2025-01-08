@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  configserver:
+    image: kroessoda/configserver:latest
+    mem_limit: 700m
+    ports:
+      - "8071:8071"
+    networks:
+      - sodanetwork
+  accounts:
+    image: kroessoda/account:latest
+    mem_limit: 700m
+    ports:
+      - "8080:8080"
+    networks:
+      - sodanetwork
+    depends_on:
+      - configserver
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 15s
+        max_attempts: 5
+        window: 120s
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
+
+networks:
+  sodanetwork:

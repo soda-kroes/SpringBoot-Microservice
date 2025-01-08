@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:14
+    restart: always
+    environment:
+      POSTGRES_USER: account
+      POSTGRES_PASSWORD: account123
+      POSTGRES_DB: account_db
+    ports:
+      - "5433:5432" # Maps port 5433 on the host to 5432 inside the container
+    volumes:
+      - data:/var/lib/postgresql/data
+
+  pg-admin:
+    container_name: pg_admin
+    image: dpage/pgadmin4:6
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_LISTEN_PORT: 5050
+    ports:
+      - "5050:5050"
+
+  account_service:
+    container_name: account_service
+    image: account_service
+    restart: always
+    ports:
+      - "8081:8081"
+
+volumes:
+  data:
