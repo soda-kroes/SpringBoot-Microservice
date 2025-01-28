@@ -1,10 +1,9 @@
 package com.soda.banking.card.controller;
 
-import com.soda.banking.card.dto.CardRequest;
+import com.soda.banking.card.dto.CartDTO;
 import com.soda.banking.card.entity.Card;
 import com.soda.banking.card.mapper.CardMapper;
 import com.soda.banking.card.services.CardService;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +18,8 @@ public class CardController {
     private final CardMapper cardMapper;
 
     @PostMapping()
-    public ResponseEntity<?> saveCard(@RequestBody CardRequest cardRequest){
-        Card card = cardMapper.toCard(cardRequest);
+    public ResponseEntity<?> saveCard(@RequestBody CartDTO cartDTO){
+        Card card = cardMapper.toCard(cartDTO);
         Card response = cardService.saveCard(card);
         return ResponseEntity.ok(response);
     }

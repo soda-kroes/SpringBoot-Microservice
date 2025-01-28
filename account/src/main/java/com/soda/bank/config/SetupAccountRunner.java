@@ -21,14 +21,14 @@ public class SetupAccountRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         Customer customer = new Customer();
-        customer.setCreatedDate(LocalDate.now());
+        customer.setCreateDate(LocalDate.now());
         customer.setEmail("soda@gmail.com");
         customer.setMobileNumber("010987001");
         customer.setName("Soda.Kroes");
         customerRepository.save(customer);
 
         Account account = new Account();
-        account.setAccountNumber("001");
+        account.setAccountNumber(268L);
         account.setAccountType("Saving");
         account.setBranchAddress("Phnom Penh");
         account.setCreateDate(LocalDate.now());

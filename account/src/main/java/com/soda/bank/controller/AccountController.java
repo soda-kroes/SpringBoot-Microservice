@@ -1,38 +1,38 @@
 package com.soda.bank.controller;
 
+import com.soda.bank.dto.AccountDTO;
 import com.soda.bank.entity.Account;
-import com.soda.bank.exception.NotFoundException;
-import com.soda.bank.request.AccountRequest;
+import com.soda.bank.mapper.AccountMapper;
 import com.soda.bank.service.AccountService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import java.util.List;
 
 @RestController
-@RequestMapping("/api/accounts")
-@RequiredArgsConstructor
+@RequestMapping("api/accounts")
 public class AccountController {
-    private final AccountService accountService;
+    @Autowired
+    private AccountService accountService;
 
-    @PostMapping()
-    public ResponseEntity<?> addAccount(@Valid @RequestBody AccountRequest request) throws NotFoundException {
-        Account account = accountService.createAccount(request);
-        return new ResponseEntity<>(account, HttpStatus.CREATED);
+    @Autowired
+    private AccountMapper accountMapper;
+
+    @PostMapping
+    public ResponseEntity<?> saveAccount(@RequestBody AccountDTO dto) {
+        Account Account = accountMapper.toAccount(dto);
+        Account = accountService.save(Account);
+        return ResponseEntity.ok(Account);
     }
 
-    @GetMapping()
-    public ResponseEntity<?> getAllAccounts() {
-        List<Account> allAccounts = accountService.getAllAccounts();
-        return new ResponseEntity<>(allAccounts, HttpStatus.OK);
+    @GetMapping
+    public ResponseEntity<?> getAccounts() {
+        return ResponseEntity.ok(accountService.getAccounts());
     }
 
-    @GetMapping("{accountNumber}")
-    public ResponseEntity<?> getAccount(@PathVariable(name = "accountNumber") String accountNumber) throws NotFoundException {
-        Account account = accountService.getAccountByAcctNumber(accountNumber);
-        return new ResponseEntity<>(account,HttpStatus.OK);
+    @GetMapping("{accountId}")
+    public ResponseEntity<?> getAccounts(@PathVariable Long accountId) {
+        return ResponseEntity.ok(accountService.getById(accountId));
     }
+
 }

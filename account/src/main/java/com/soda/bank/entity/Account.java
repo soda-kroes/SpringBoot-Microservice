@@ -1,29 +1,26 @@
 package com.soda.bank.entity;
 
-
-import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import javax.persistence.*;
 import java.time.LocalDate;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
+import lombok.Data;
+
+@Entity
 @Data
-@Entity(name = "accounts")
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String accountNumber;
-
+    private Long accountNumber;
     @ManyToOne
-    @JoinColumn(name = "customer_id")
+    @JoinColumn(name = "customerId")
     private Customer customer;
-
     private String accountType;
-
     private String branchAddress;
-
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDate createDate;
 }

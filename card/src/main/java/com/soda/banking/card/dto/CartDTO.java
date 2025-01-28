@@ -3,7 +3,7 @@ package com.soda.banking.card.dto;
 import lombok.Data;
 
 @Data
-public class CardRequest {
+public class CartDTO {
     private Long cardId;
     private Long customerId;
     private Long cardNumber;

@@ -1,59 +1,77 @@
 package com.soda.bank.controller;
 
-import com.soda.bank.entity.Customer;
-import com.soda.bank.exception.AlreadyExistException;
-import com.soda.bank.exception.NotFoundException;
-import com.soda.bank.request.CustomerRequest;
-import com.soda.bank.response.StatusResponse;
-import com.soda.bank.service.CustomerService;
-
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 import java.util.List;
+
+import com.soda.bank.dto.CardResponseDTO;
+import com.soda.bank.dto.CustomerDTO;
+import com.soda.bank.dto.CustomerDetailDTO;
+import com.soda.bank.dto.LoanResponseDTO;
+import com.soda.bank.entity.Customer;
+import com.soda.bank.mapper.CustomerMapper;
+import com.soda.bank.service.CustomerService;
+import com.soda.bank.service.client.CardFeignClient;
+import com.soda.bank.service.client.LoanFeignClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+
 
 @RestController
 @RequestMapping("api/customers")
-@RequiredArgsConstructor
 public class CustomerController {
+    @Autowired
+    private CustomerService customerService;
+    @Autowired
+    private CustomerMapper customerMapper;
 
-    private final CustomerService customerService;
+    @Autowired
+    private CardFeignClient cardFeignClient;
 
-    @PostMapping()
-    public ResponseEntity<Customer> createCustomer(@Valid @RequestBody CustomerRequest request) throws AlreadyExistException {
-        Customer customer = customerService.addCustomer(request);
-        return new ResponseEntity<>(customer, HttpStatus.CREATED);
+    @Autowired
+    private LoanFeignClient loanFeignClient;
+
+    @PostMapping
+    public ResponseEntity<?> saveCustomer(@RequestBody CustomerDTO dto){
+        Customer customer = customerMapper.toCustomer(dto);
+        customer = customerService.save(customer);
+        return ResponseEntity.ok(customer);
     }
 
-    @GetMapping()
-    public ResponseEntity<List<Customer>> getAllCustomers() {
-        List<Customer> customers = customerService.getAllCustomers();
-        return new ResponseEntity<>(customers, HttpStatus.OK);
+    @GetMapping
+    public ResponseEntity<?> getCustomers(){
+        return ResponseEntity.ok(customerService.getCustomers());
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<Customer> getCustomer(@PathVariable long id) throws NotFoundException {
-        Customer customer = customerService.getById(id);
-        return new ResponseEntity<>(customer, HttpStatus.OK);
+    @GetMapping("{customerId}")
+    public ResponseEntity<?> getCustomers(@PathVariable Long customerId){
+        return ResponseEntity.ok(customerService.getById(customerId));
     }
 
-    @PutMapping("{id}")
-    public ResponseEntity<Customer> updateCustomer(@Valid @PathVariable Long id, @RequestBody CustomerRequest request) throws NotFoundException {
-        Customer customer = customerService.update(id, request);
-        return new ResponseEntity<>(customer, HttpStatus.OK);
-    }
-
-    @DeleteMapping("{id}")
-    public ResponseEntity<StatusResponse> deleteCustomer(@PathVariable Long id) throws NotFoundException {
-        Boolean deleted = customerService.deleteCustomerById(id);
-        StatusResponse res = new StatusResponse();
-        if (deleted) {
-            res.setCode(200);
-            res.setMessage("Customer deleted from system successfully");
+    @GetMapping("customerDetail/{myCustomerId}")
+    public ResponseEntity<CustomerDetailDTO> getCustomerDetail(@PathVariable("myCustomerId") Long customerId){
+        CustomerDetailDTO dto = new CustomerDetailDTO();
+        Customer customer = customerService.getById(customerId);
+        if(customer == null) {
+            throw new RuntimeException("No customer found with this id");
         }
-        return new ResponseEntity<>(res, HttpStatus.OK);
+        CustomerDTO customerDTO = customerMapper.toCustomerDTO(customer);
+
+        List<LoanResponseDTO> loanInfo = loanFeignClient.getLoanInfo(customerId);
+        List<CardResponseDTO> cardInfo = cardFeignClient.getCardInfo(customerId);
+
+        dto.setCustomer(customerDTO);
+        dto.setLoans(loanInfo);
+        dto.setCards(cardInfo);
+
+
+        return ResponseEntity.ok(dto);
     }
+
+
 }
