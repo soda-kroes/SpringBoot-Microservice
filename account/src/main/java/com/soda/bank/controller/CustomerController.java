@@ -1,7 +1,5 @@
 package com.soda.bank.controller;
 
-import java.util.List;
-
 import com.soda.bank.dto.CardResponseDTO;
 import com.soda.bank.dto.CustomerDTO;
 import com.soda.bank.dto.CustomerDetailDTO;
@@ -13,13 +11,9 @@ import com.soda.bank.service.client.CardFeignClient;
 import com.soda.bank.service.client.LoanFeignClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 
 
 @RestController
@@ -27,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CustomerController {
     @Autowired
     private CustomerService customerService;
+
     @Autowired
     private CustomerMapper customerMapper;
 
@@ -37,27 +32,27 @@ public class CustomerController {
     private LoanFeignClient loanFeignClient;
 
     @PostMapping
-    public ResponseEntity<?> saveCustomer(@RequestBody CustomerDTO dto){
+    public ResponseEntity<?> saveCustomer(@RequestBody CustomerDTO dto) {
         Customer customer = customerMapper.toCustomer(dto);
         customer = customerService.save(customer);
         return ResponseEntity.ok(customer);
     }
 
     @GetMapping
-    public ResponseEntity<?> getCustomers(){
+    public ResponseEntity<?> getCustomers() {
         return ResponseEntity.ok(customerService.getCustomers());
     }
 
     @GetMapping("{customerId}")
-    public ResponseEntity<?> getCustomers(@PathVariable Long customerId){
+    public ResponseEntity<?> getCustomers(@PathVariable Long customerId) {
         return ResponseEntity.ok(customerService.getById(customerId));
     }
 
     @GetMapping("customerDetail/{myCustomerId}")
-    public ResponseEntity<CustomerDetailDTO> getCustomerDetail(@PathVariable("myCustomerId") Long customerId){
+    public ResponseEntity<CustomerDetailDTO> getCustomerDetail(@PathVariable("myCustomerId") Long customerId) {
         CustomerDetailDTO dto = new CustomerDetailDTO();
         Customer customer = customerService.getById(customerId);
-        if(customer == null) {
+        if (customer == null) {
             throw new RuntimeException("No customer found with this id");
         }
         CustomerDTO customerDTO = customerMapper.toCustomerDTO(customer);
