@@ -55,7 +55,7 @@
     </dependencyManagement>
 
     <build>
-        <finalName>configserver</finalName>
+        <finalName>config_server</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

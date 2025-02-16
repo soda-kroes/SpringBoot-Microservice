@@ -5,7 +5,7 @@ FROM openjdk:17 as build
 MAINTAINER sodabank
 
 #Add the application's jar to container
-COPY target/config_server.jar config_server.jar
+COPY target/card.jar card.jar
 
 #Execute the application
-ENTRYPOINT ["java", "-jar","/config_server.jar"]
+ENTRYPOINT ["java", "-jar","/card.jar"]
